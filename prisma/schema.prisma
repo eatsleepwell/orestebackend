@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  username    String        @id @db.VarChar(100)
+  password    String        @db.VarChar(100)
+  name        String        @db.VarChar(100)
+  token       String?       @db.VarChar(100)
+  Criteria    Criteria[]
+  Alternative Alternative[]
+  Results     Results[]
+
+  @@map("users")
+}
+
+model Criteria {
+  id                Int                 @id @default(autoincrement())
+  criteria_name     String              @db.VarChar(100)
+  criteria_code     String              @db.VarChar(100)
+  username          String              @db.VarChar(100)
+  user              User                @relation(fields: [username], references: [username])
+  SubCriteria       SubCriteria[]
+  AlternativeScores AlternativeScores[]
+
+  @@map("criteria")
+}
+
+model SubCriteria {
+  id                 Int                 @id @default(autoincrement())
+  sub_criteria_name  String              @db.VarChar(100)
+  sub_criteria_score Int
+  criteria_id        Int
+  criteria           Criteria            @relation(fields: [criteria_id], references: [id])
+  AlternativeScores  AlternativeScores[]
+
+  @@map("sub_criteria")
+}
+
+model Alternative {
+  id                 Int                 @id @default(autoincrement())
+  alternative_name   String              @db.VarChar(100)
+  username           String              @db.VarChar(100)
+  accumulation_score Float?
+  rank               Int?
+  user               User                @relation(fields: [username], references: [username])
+  AlternativeScores  AlternativeScores[]
+
+  @@map("alternative")
+}
+
+model AlternativeScores {
+  id             Int         @id @default(autoincrement())
+  alternative_id Int
+  criteria_id    Int
+  subcriteria_id Int
+  distance_score Float?
+  besson_rank    Float?
+  alternative    Alternative @relation(fields: [alternative_id], references: [id])
+  criteria       Criteria    @relation(fields: [criteria_id], references: [id])
+  subcriteria    SubCriteria @relation(fields: [subcriteria_id], references: [id])
+
+  @@map("alternative_scores")
+}
+
+model Results {
+  id          Int      @id @default(autoincrement())
+  result_name String   @db.VarChar(100)
+  date        DateTime @default(now()) @db.DateTime()
+  username    String   @db.VarChar(100)
+  user        User     @relation(fields: [username], references: [username])
+  result      Result[]
+
+  @@map("results")
+}
+
+model Result {
+  id               Int     @id @default(autoincrement())
+  alternative_name String  @db.VarChar(100)
+  rank             Int
+  results_id       Int
+  results          Results @relation(fields: [results_id], references: [id])
+
+  @@map("result")
+}

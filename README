@@ -1,0 +1,13 @@
+masukan command untuk menginstal dependency:
+npm i
+
+database yang digunakan MySQL
+
+untuk instalasi schema prisma menjadi database dengan command:
+npx prisma migrate dev
+pada terminal
+
+Selanjutnya 
+
+Untuk menjalankan aplikasi dengan command:
+nodemon src/main.js
